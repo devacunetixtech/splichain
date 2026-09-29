@@ -13,7 +13,7 @@ export const botchainTestnet = defineChain({
 });
 
 // The testnet deployment workflow replaces this value with the deployed address.
-export const SPLITCHAIN_ADDRESS: "" | `0x${string}` = "";
+export const SPLITCHAIN_ADDRESS: "" | `0x${string}` = "0x3b61D35fB269Ea8e5368274Ed45326feadF928bE";
 export const CONTRACT_READY = Boolean(SPLITCHAIN_ADDRESS && /^0x[a-fA-F0-9]{40}$/.test(SPLITCHAIN_ADDRESS));
 
 export const addBotchainTestnetParams = {
