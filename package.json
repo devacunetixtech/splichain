@@ -1,0 +1,48 @@
+{
+  "name": "splitchain",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "contract:compile": "hardhat compile --config hardhat.config.cjs",
+    "contract:test": "hardhat test test/SplitChain.test.cjs --config hardhat.config.cjs",
+    "contract:set-address": "node scripts/set-contract-address.mjs",
+    "contract:deploy:testnet": "hardhat run scripts/deploy.cjs --network botchainTestnet --config hardhat.config.cjs",
+    "contract:deploy:mainnet": "hardhat run scripts/deploy.cjs --network botchainMainnet --config hardhat.config.cjs"
+  },
+  "dependencies": {
+    "lucide-react": "^1.31.0",
+    "next": "16.3.4",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "viem": "^2.38.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
+    "@nomicfoundation/hardhat-ethers": "^3.1.0",
+    "@nomicfoundation/hardhat-verify": "^2.1.1",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/chai": "^5.2.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "chai": "^5.3.3",
+    "dotenv": "^17.2.3",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.3.4",
+    "ethers": "^6.15.0",
+    "hardhat": "^2.26.3",
+    "tailwindcss": "4.2.1",
+    "ts-node": "^10.9.2",
+    "typescript": "5.9.3"
+  },
+  "type": "module"
+}
