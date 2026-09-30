@@ -8,6 +8,7 @@ import {
   Check,
   CircleDollarSign,
   ExternalLink,
+  LogOut,
   LoaderCircle,
   LockKeyhole,
   Network,
@@ -57,7 +58,7 @@ const emptyRecipients: RecipientDraft[] = [
 const previewColors = ["#7C5CFC", "#2BB673", "#F3A63B", "#377CF6", "#E55574"];
 const publicClient = createPublicClient({ chain: botchainTestnet, transport: http() });
 
-export function SplitterApp({ account }: { account: Address }) {
+export function SplitterApp({ account, onDisconnect }: { account: Address; onDisconnect: () => void }) {
   const [splitName, setSplitName] = useState("");
   const [amount, setAmount] = useState("");
   const [recipients, setRecipients] = useState(emptyRecipients);
@@ -234,6 +235,7 @@ export function SplitterApp({ account }: { account: Address }) {
         <div className="wallet-area">
           <a className="faucet-link" href="https://faucet.botchain.ai" target="_blank" rel="noreferrer">Get test BOT <ExternalLink size={13} /></a>
           <a className="connected-wallet" href={`https://scan.bohr.life/address/${account}`} target="_blank" rel="noreferrer"><i className="online" /><span>{shortAddress(account)}</span><ExternalLink size={14} /></a>
+          <button className="disconnect-button" type="button" onClick={onDisconnect} aria-label="Disconnect wallet"><LogOut size={15} /><span>Disconnect</span></button>
         </div>
       </header>
 

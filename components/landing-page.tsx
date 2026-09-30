@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2, LockKeyhole, Network, Percent, ShieldCheck, Wallet } from "lucide-react";
+import { ArrowRight, CheckCircle2, LogOut, LockKeyhole, Network, Percent, ShieldCheck, Wallet } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { SiteFooter } from "@/components/site-footer";
 import { useWallet } from "@/hooks/use-wallet";
@@ -11,23 +11,20 @@ export function LandingPage() {
   const router = useRouter();
   const wallet = useWallet();
 
-  async function enterApp() {
-    if (wallet.account && wallet.isBotchain) {
-      router.push("/app");
-      return;
-    }
-    const connected = wallet.account ?? await wallet.connect();
-    if (connected) router.push("/app");
-  }
+  const openApp = () => router.push("/app");
+  const connectWallet = () => void wallet.connect();
 
   return (
     <div className="landing-shell">
       <header className="landing-nav">
         <Link href="/" aria-label="SplitChain home"><BrandMark /></Link>
         <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#security">Security</a><a href="#network">BOT Chain</a></nav>
-        <button className="nav-wallet" type="button" onClick={enterApp} disabled={wallet.connecting}>
-          <Wallet size={17} />{wallet.connecting ? "Connecting…" : wallet.account ? "Open app" : "Connect wallet"}
-        </button>
+        <div className="landing-wallet-actions">
+          {wallet.account ? <button className="nav-disconnect" type="button" onClick={wallet.disconnect} aria-label="Disconnect wallet"><LogOut size={16} />Disconnect</button> : null}
+          <button className="nav-wallet" type="button" onClick={wallet.account ? openApp : connectWallet} disabled={wallet.connecting}>
+            <Wallet size={17} />{wallet.connecting ? "Connecting…" : wallet.account ? "Open App" : "Connect wallet"}
+          </button>
+        </div>
       </header>
 
       <main>
@@ -37,8 +34,8 @@ export function LandingPage() {
             <h1>One payment.<br />Everyone gets their share.</h1>
             <p className="hero-text">Create an on-chain split between multiple wallets, fund it with native BOT, and distribute the full balance using fixed percentages.</p>
             <div className="hero-actions">
-              <button className="hero-primary" type="button" onClick={enterApp} disabled={wallet.connecting}><Wallet size={18} />{wallet.connecting ? "Connecting wallet…" : "Connect wallet to start"}</button>
-              <a className="hero-secondary" href="#how-it-works">See how it works <ArrowRight size={17} /></a>
+              <button className="hero-primary" type="button" onClick={wallet.account ? openApp : connectWallet} disabled={wallet.connecting}><Wallet size={18} />{wallet.connecting ? "Connecting wallet…" : wallet.account ? "Open App" : "Connect wallet to start"}</button>
+              {wallet.account ? <button className="hero-secondary" type="button" onClick={wallet.disconnect}><LogOut size={17} />Disconnect</button> : <a className="hero-secondary" href="#how-it-works">See how it works <ArrowRight size={17} /></a>}
             </div>
             {wallet.error ? <p className="wallet-error" role="alert">{wallet.error}</p> : null}
             <div className="hero-proof"><span><CheckCircle2 size={15} /> Exact 100% allocation</span><span><CheckCircle2 size={15} /> Native BOT payments</span><span><CheckCircle2 size={15} /> Creator-controlled release</span></div>
@@ -79,7 +76,7 @@ export function LandingPage() {
           <div className="network-links"><a href="https://botchain.ai" target="_blank" rel="noreferrer">BOT Chain website</a><a href="https://scan.botchain.ai" target="_blank" rel="noreferrer">Mainnet explorer</a><a href="https://scan.bohr.life" target="_blank" rel="noreferrer">Testnet explorer</a></div>
         </section>
 
-        <section className="landing-cta"><div><h2>Ready to create a split?</h2><p>Connect a wallet on BOT Chain Testnet to access the app.</p></div><button className="hero-primary" type="button" onClick={enterApp} disabled={wallet.connecting}>Connect wallet <ArrowRight size={17} /></button></section>
+        <section className="landing-cta"><div><h2>Ready to create a split?</h2><p>{wallet.account ? "Your wallet is connected. Open the app when you are ready." : "Connect a wallet on BOT Chain Testnet to access the app."}</p></div><button className="hero-primary" type="button" onClick={wallet.account ? openApp : connectWallet} disabled={wallet.connecting}>{wallet.connecting ? "Connecting…" : wallet.account ? "Open App" : "Connect wallet"} <ArrowRight size={17} /></button></section>
       </main>
       <SiteFooter />
     </div>

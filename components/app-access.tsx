@@ -34,5 +34,5 @@ export function AppAccess() {
     );
   }
 
-  return <SplitterApp account={wallet.account} />;
+  return <SplitterApp account={wallet.account} onDisconnect={wallet.disconnect} />;
 }

@@ -5,6 +5,8 @@ import type { Address } from "viem";
 import { addBotchainTestnetParams, botchainTestnet } from "@/lib/chain";
 import { toUserMessage } from "@/lib/errors";
 
+const DISCONNECTED_SESSION_KEY = "splitchain:wallet-disconnected";
+
 export function shortAddress(address: string) {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
@@ -17,6 +19,12 @@ export function useWallet() {
   const [error, setError] = useState<string | null>(null);
 
   const sync = useCallback(async () => {
+    if (window.sessionStorage.getItem(DISCONNECTED_SESSION_KEY) === "true") {
+      setAccount(null);
+      setChainId(null);
+      setChecking(false);
+      return;
+    }
     if (!window.ethereum) {
       setChecking(false);
       return;
@@ -63,6 +71,7 @@ export function useWallet() {
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" }) as string[];
       const nextAccount = accounts[0] as Address | undefined;
       if (!nextAccount) throw new Error("No account selected");
+      window.sessionStorage.removeItem(DISCONNECTED_SESSION_KEY);
       setAccount(nextAccount);
       await switchNetwork();
       return nextAccount;
@@ -73,6 +82,14 @@ export function useWallet() {
       setConnecting(false);
     }
   }, [switchNetwork]);
+
+  const disconnect = useCallback(() => {
+    window.sessionStorage.setItem(DISCONNECTED_SESSION_KEY, "true");
+    setAccount(null);
+    setChainId(null);
+    setError(null);
+    setConnecting(false);
+  }, []);
 
   useEffect(() => {
     const initialSync = window.setTimeout(() => void sync(), 0);
@@ -95,6 +112,7 @@ export function useWallet() {
     error,
     isBotchain: chainId === botchainTestnet.id,
     connect,
+    disconnect,
     switchNetwork,
     clearError: () => setError(null),
   };
