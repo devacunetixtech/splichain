@@ -2,12 +2,12 @@ import { defineChain } from "viem";
 
 // DEPLOYMENT_CONFIG_START
 export const BOTCHAIN_DEPLOYMENT = {
-  chainId: 968,
-  chainName: "BOT Chain Testnet",
-  rpcUrl: "https://rpc.bohr.life",
-  explorerUrl: "https://scan.bohr.life",
-  isTestnet: true,
-  contractAddress: "0x3b61D35fB269Ea8e5368274Ed45326feadF928bE",
+  chainId: 677,
+  chainName: "BOT Chain",
+  rpcUrl: "https://rpc.botchain.ai",
+  explorerUrl: "https://scan.botchain.ai",
+  isTestnet: false,
+  contractAddress: "0x9F289c94a24Cd16b40E5C797327fECf57a8B442b",
 } as const;
 // DEPLOYMENT_CONFIG_END
 
