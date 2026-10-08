@@ -1,3 +1,5 @@
+import { BOTCHAIN_DEPLOYMENT } from "@/lib/chain";
+
 const userMessages: Array<[string, string]> = [
   ["User rejected", "You cancelled the request in your wallet."],
   ["user rejected", "You cancelled the request in your wallet."],
@@ -10,7 +12,7 @@ const userMessages: Array<[string, string]> = [
   ["InvalidRecipientCount", "A split needs between 2 and 50 recipients."],
   ["Unauthorized", "Only the wallet that created this split can distribute its balance."],
   ["NothingToDistribute", "This split has no BOT available to distribute."],
-  ["SplitNotFound", "That split ID does not exist on BOT Chain Testnet."],
+  ["SplitNotFound", `That split ID does not exist on ${BOTCHAIN_DEPLOYMENT.chainName}.`],
   ["TransferFailed", "A recipient wallet could not receive BOT. No funds were distributed."],
   ["network changed", "Your wallet changed networks. Please try again."],
   ["could not coalesce", "Your wallet could not process the request. Check the network and try again."],

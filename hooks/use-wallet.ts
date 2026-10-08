@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Address } from "viem";
-import { addBotchainTestnetParams, botchainTestnet } from "@/lib/chain";
+import { addBotchainParams, botchain } from "@/lib/chain";
 import { toUserMessage } from "@/lib/errors";
 
 const DISCONNECTED_SESSION_KEY = "splitchain:wallet-disconnected";
@@ -49,15 +49,15 @@ export function useWallet() {
   const switchNetwork = useCallback(async () => {
     if (!window.ethereum) throw new Error("Wallet unavailable");
     try {
-      await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x3c8" }] });
+      await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: addBotchainParams.chainId }] });
     } catch (networkError) {
       const code = typeof networkError === "object" && networkError !== null && "code" in networkError
         ? (networkError as { code?: number }).code
         : undefined;
       if (code !== 4902) throw networkError;
-      await window.ethereum.request({ method: "wallet_addEthereumChain", params: [addBotchainTestnetParams] });
+      await window.ethereum.request({ method: "wallet_addEthereumChain", params: [addBotchainParams] });
     }
-    setChainId(botchainTestnet.id);
+    setChainId(botchain.id);
   }, []);
 
   const connect = useCallback(async () => {
@@ -110,7 +110,7 @@ export function useWallet() {
     checking,
     connecting,
     error,
-    isBotchain: chainId === botchainTestnet.id,
+    isBotchain: chainId === botchain.id,
     connect,
     disconnect,
     switchNetwork,

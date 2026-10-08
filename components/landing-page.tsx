@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle2, LogOut, LockKeyhole, Network, Percent, Shield
 import { BrandMark } from "@/components/brand-mark";
 import { SiteFooter } from "@/components/site-footer";
 import { useWallet } from "@/hooks/use-wallet";
+import { BOTCHAIN_DEPLOYMENT } from "@/lib/chain";
 
 export function LandingPage() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export function LandingPage() {
           </div>
 
           <div className="route-panel" aria-label="SplitChain payment flow">
-            <div className="route-header"><span>Payment route</span><span className="route-network"><i /> BOT Chain Testnet</span></div>
+            <div className="route-header"><span>Payment route</span><span className="route-network"><i /> {BOTCHAIN_DEPLOYMENT.chainName}</span></div>
             <div className="route-source"><span className="route-icon"><Wallet size={20} /></span><div><small>Split balance</small><strong>Native BOT</strong></div></div>
             <div className="route-line"><span /></div>
             <div className="route-rule"><Percent size={18} /><span><strong>Fixed allocation</strong><small>Shares must equal 100%</small></span></div>
@@ -72,11 +73,11 @@ export function LandingPage() {
 
         <section id="network" className="network-section">
           <div><p className="section-label">Built on BOT Chain</p><h2>EVM-compatible settlement for native BOT.</h2></div>
-          <div className="network-facts"><span><small>Network</small><strong>BOT Chain Testnet</strong></span><span><small>Chain ID</small><strong>968</strong></span><span><small>Currency</small><strong>BOT</strong></span></div>
-          <div className="network-links"><a href="https://botchain.ai" target="_blank" rel="noreferrer">BOT Chain website</a><a href="https://scan.botchain.ai" target="_blank" rel="noreferrer">Mainnet explorer</a><a href="https://scan.bohr.life" target="_blank" rel="noreferrer">Testnet explorer</a></div>
+          <div className="network-facts"><span><small>Network</small><strong>{BOTCHAIN_DEPLOYMENT.chainName}</strong></span><span><small>Chain ID</small><strong>{BOTCHAIN_DEPLOYMENT.chainId}</strong></span><span><small>Currency</small><strong>BOT</strong></span></div>
+          <div className="network-links"><a href="https://botchain.ai" target="_blank" rel="noreferrer">BOT Chain website</a><a href={BOTCHAIN_DEPLOYMENT.explorerUrl} target="_blank" rel="noreferrer">{BOTCHAIN_DEPLOYMENT.isTestnet ? "Testnet explorer" : "Mainnet explorer"}</a></div>
         </section>
 
-        <section className="landing-cta"><div><h2>Ready to create a split?</h2><p>{wallet.account ? "Your wallet is connected. Open the app when you are ready." : "Connect a wallet on BOT Chain Testnet to access the app."}</p></div><button className="hero-primary" type="button" onClick={wallet.account ? openApp : connectWallet} disabled={wallet.connecting}>{wallet.connecting ? "Connecting…" : wallet.account ? "Open App" : "Connect wallet"} <ArrowRight size={17} /></button></section>
+        <section className="landing-cta"><div><h2>Ready to create a split?</h2><p>{wallet.account ? "Your wallet is connected. Open the app when you are ready." : `Connect a wallet on ${BOTCHAIN_DEPLOYMENT.chainName} to access the app.`}</p></div><button className="hero-primary" type="button" onClick={wallet.account ? openApp : connectWallet} disabled={wallet.connecting}>{wallet.connecting ? "Connecting…" : wallet.account ? "Open App" : "Connect wallet"} <ArrowRight size={17} /></button></section>
       </main>
       <SiteFooter />
     </div>

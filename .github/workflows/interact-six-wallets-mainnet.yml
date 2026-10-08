@@ -1,0 +1,44 @@
+name: Interact with Six Mainnet Wallets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: botchain-mainnet-six-wallets
+  cancel-in-progress: false
+
+jobs:
+  interact:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: botchain-mainnet
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Compile contract
+        run: pnpm contract:compile
+
+      - name: Create six wallets and interact
+        run: pnpm contract:interact-six-mainnet
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}

@@ -7,7 +7,7 @@ SplitChain is a native-BOT payment splitter for BOT Chain. Users connect a real 
 ## Product flow
 
 - `/` — public landing page explaining the product, contract safeguards, and BOT Chain integration.
-- `/app` — wallet-gated DApp. A connected wallet on BOT Chain Testnet is required before the splitter is shown.
+- `/app` — wallet-gated DApp. A connected wallet on the configured BOT Chain network is required before the splitter is shown.
 - All split balances and transaction history are read directly from the deployed contract and BOT Chain events.
 - No mock wallet, fake balance, sample transaction, or simulated confirmation is used.
 
@@ -44,14 +44,14 @@ Do not put secrets in `.env.example`. The real `.env` file is ignored by Git.
 Create a file named `.env` in the project root—the same directory as `package.json` and `hardhat.config.cjs`:
 
 ```env
-DEPLOYER_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
+PRIVATE_KEY=0xYOUR_PRIVATE_KEY
 BLOCKSCOUT_API_KEY=YOUR_BLOCKSCOUT_API_KEY
 ```
 
 Important:
 
-- `DEPLOYER_PRIVATE_KEY` must include the `0x` prefix.
-- The deployer wallet needs test BOT from <https://faucet.botchain.ai>.
+- `PRIVATE_KEY` may be supplied with or without the `0x` prefix.
+- The deployer wallet needs test BOT for testnet or real BOT for mainnet gas.
 - Never commit `.env`, paste its values into source code, or place private keys in `NEXT_PUBLIC_*` variables.
 - `BLOCKSCOUT_API_KEY` is read by the Hardhat verification plugin.
 - BOT Chain RPC and explorer URLs are public constants in `lib/chain.ts` and `hardhat.config.cjs`.
@@ -91,7 +91,30 @@ After a local deployment, write the printed public address into the frontend sou
 pnpm contract:set-address 0xDEPLOYED_CONTRACT_ADDRESS
 ```
 
-The repository also includes a manual **Deploy BOT Chain Testnet** GitHub Actions workflow. It reads only `DEPLOYER_PRIVATE_KEY` and `BLOCKSCOUT_API_KEY` from GitHub Secrets, runs the tests, deploys and verifies the contract, writes the real address into `lib/chain.ts`, and commits that public address back to `main`.
+The repository also includes a manual **Deploy BOT Chain Testnet** GitHub Actions workflow. It reads only `PRIVATE_KEY` and `BLOCKSCOUT_API_KEY` from GitHub Secrets, runs the tests, deploys and verifies the contract, writes the real address into `lib/chain.ts`, and commits that public address back to `main`.
+
+## Deploy, verify, and activate BOT Chain Mainnet
+
+Add `PRIVATE_KEY` and `BLOCKSCOUT_API_KEY` as GitHub repository secrets, then run the manual **Deploy BOT Chain Mainnet** workflow from the `main` branch. It:
+
+1. Runs the contract tests.
+2. Deploys to chain ID 677 through `https://rpc.botchain.ai`.
+3. Requires successful Blockscout verification.
+4. Only after verification succeeds, replaces the frontend's testnet network and contract configuration with the mainnet values.
+5. Commits the public mainnet address to `main`, which triggers the normal frontend deployment.
+
+The app therefore stays on the working testnet contract if deployment or verification fails. To run the same operation locally:
+
+```bash
+REQUIRE_VERIFICATION=true pnpm contract:deploy:mainnet
+pnpm contract:set-mainnet 0xDEPLOYED_CONTRACT_ADDRESS
+```
+
+## Six-wallet mainnet interaction
+
+After the mainnet deployment workflow has completed, run **Interact with Six Mainnet Wallets**. The workflow generates six one-time wallets in memory, funds each with only the amount required for one contract call, and has each wallet deposit `1 wei` into a shared split. This is the smallest valid deposit accepted by the contract.
+
+The Actions summary contains the six public wallet addresses and their transaction links. Private keys are never printed or saved, so these wallets are deliberately not recoverable. The workflow uses one contract transaction per wallet; the necessary native funding transfers and one shared split-creation transaction are additional transactions paid by the funded deployer.
 
 ## BOT Chain configuration
 

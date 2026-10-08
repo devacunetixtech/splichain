@@ -2,6 +2,13 @@ const fs = require("node:fs");
 const { ethers, network, run } = require("hardhat");
 
 async function main() {
+  const [deployer] = await ethers.getSigners();
+  if (!deployer) throw new Error("PRIVATE_KEY is required for deployment.");
+  const deployerAddress = await deployer.getAddress();
+  const balance = await ethers.provider.getBalance(deployerAddress);
+  if (balance === 0n) throw new Error(`Deployer ${deployerAddress} has no BOT for gas on ${network.name}.`);
+  console.log(`Deploying from: ${deployerAddress}`);
+
   const SplitChain = await ethers.getContractFactory("SplitChain");
   const splitChain = await SplitChain.deploy();
   await splitChain.waitForDeployment();
@@ -13,6 +20,9 @@ async function main() {
   }
 
   if (!process.env.BLOCKSCOUT_API_KEY) {
+    if (process.env.REQUIRE_VERIFICATION === "true") {
+      throw new Error("BLOCKSCOUT_API_KEY is required because verification is mandatory for this deployment.");
+    }
     console.log("Verification skipped: add BLOCKSCOUT_API_KEY to .env and run the verify command from README.md.");
     return;
   }

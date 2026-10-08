@@ -1,0 +1,75 @@
+name: Deploy BOT Chain Mainnet
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: botchain-mainnet-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: botchain-mainnet
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Require deployment secrets
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
+        run: |
+          test -n "$PRIVATE_KEY" || { echo "PRIVATE_KEY is not configured"; exit 1; }
+          test -n "$BLOCKSCOUT_API_KEY" || { echo "BLOCKSCOUT_API_KEY is not configured"; exit 1; }
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run contract tests
+        run: pnpm contract:test
+
+      - name: Deploy and verify contract
+        id: deploy
+        run: pnpm contract:deploy:mainnet
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}
+          REQUIRE_VERIFICATION: "true"
+
+      - name: Activate mainnet in the frontend
+        run: pnpm contract:set-mainnet "${{ steps.deploy.outputs.contract_address }}"
+
+      - name: Commit verified mainnet deployment
+        env:
+          CONTRACT_ADDRESS: ${{ steps.deploy.outputs.contract_address }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/chain.ts
+          git commit -m "chore: activate BOT Chain mainnet deployment"
+          git push origin HEAD:main
+          {
+            echo "## BOT Chain mainnet deployment"
+            echo
+            echo "Verified contract: https://scan.botchain.ai/address/$CONTRACT_ADDRESS"
+            echo
+            echo "The frontend configuration now targets chain ID 677."
+          } >> "$GITHUB_STEP_SUMMARY"

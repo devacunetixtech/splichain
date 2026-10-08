@@ -13,8 +13,10 @@
     "contract:compile": "hardhat compile --config hardhat.config.cjs",
     "contract:test": "hardhat test test/SplitChain.test.cjs --config hardhat.config.cjs",
     "contract:set-address": "node scripts/set-contract-address.mjs",
+    "contract:set-mainnet": "node scripts/set-mainnet-deployment.mjs",
     "contract:deploy:testnet": "hardhat run scripts/deploy.cjs --network botchainTestnet --config hardhat.config.cjs",
-    "contract:deploy:mainnet": "hardhat run scripts/deploy.cjs --network botchainMainnet --config hardhat.config.cjs"
+    "contract:deploy:mainnet": "hardhat run scripts/deploy.cjs --network botchainMainnet --config hardhat.config.cjs",
+    "contract:interact-six-mainnet": "node scripts/interact-six-wallets.cjs"
   },
   "dependencies": {
     "lucide-react": "^1.31.0",

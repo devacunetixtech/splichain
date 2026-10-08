@@ -33,7 +33,7 @@ import { RecipientBuilder, type RecipientDraft } from "@/components/recipient-bu
 import { SiteFooter } from "@/components/site-footer";
 import { TransactionHistory, type ActivityItem } from "@/components/transaction-history";
 import { shortAddress } from "@/hooks/use-wallet";
-import { botchainTestnet, CONTRACT_READY, SPLITCHAIN_ADDRESS } from "@/lib/chain";
+import { botchain, BOTCHAIN_DEPLOYMENT, CONTRACT_READY, SPLITCHAIN_ADDRESS } from "@/lib/chain";
 import { splitChainAbi } from "@/lib/contract";
 import { toUserMessage } from "@/lib/errors";
 
@@ -56,7 +56,7 @@ const emptyRecipients: RecipientDraft[] = [
   { id: "recipient-2", label: "", address: "", percentage: "" },
 ];
 const previewColors = ["#7C5CFC", "#2BB673", "#F3A63B", "#377CF6", "#E55574"];
-const publicClient = createPublicClient({ chain: botchainTestnet, transport: http() });
+const publicClient = createPublicClient({ chain: botchain, transport: http() });
 
 export function SplitterApp({ account, onDisconnect }: { account: Address; onDisconnect: () => void }) {
   const [splitName, setSplitName] = useState("");
@@ -89,7 +89,7 @@ export function SplitterApp({ account, onDisconnect }: { account: Address; onDis
 
   function walletClient() {
     if (!window.ethereum) throw new Error("Wallet unavailable");
-    return createWalletClient({ account, chain: botchainTestnet, transport: custom(window.ethereum as Parameters<typeof custom>[0]) });
+    return createWalletClient({ account, chain: botchain, transport: custom(window.ethereum as Parameters<typeof custom>[0]) });
   }
 
   async function confirm(hash: Hash) {
@@ -165,7 +165,7 @@ export function SplitterApp({ account, onDisconnect }: { account: Address; onDis
       if (splitId === null) throw new Error("Missing split ID");
       await Promise.all([loadSplit(splitId), loadActivity()]);
       setLookupId(splitId.toString());
-      setNotice({ tone: "success", text: `Split #${splitId} is confirmed on BOT Chain Testnet.` });
+      setNotice({ tone: "success", text: `Split #${splitId} is confirmed on ${BOTCHAIN_DEPLOYMENT.chainName}.` });
     } catch (error) {
       setNotice({ tone: "error", text: toUserMessage(error, "We could not create the split. Check your entries and try again.") });
     } finally {
@@ -213,7 +213,7 @@ export function SplitterApp({ account, onDisconnect }: { account: Address; onDis
       await loadSplit(BigInt(lookupId));
       setNotice({ tone: "success", text: `Split #${lookupId} is now loaded.` });
     } catch (error) {
-      setNotice({ tone: "error", text: toUserMessage(error, "We could not find that split on BOT Chain Testnet.") });
+      setNotice({ tone: "error", text: toUserMessage(error, `We could not find that split on ${BOTCHAIN_DEPLOYMENT.chainName}.`) });
     } finally {
       setStatus("idle");
     }
@@ -231,17 +231,17 @@ export function SplitterApp({ account, onDisconnect }: { account: Address; onDis
     <div className="app-shell">
       <header className="topbar">
         <Link href="/" className="brand-link"><BrandMark /></Link>
-        <div className="header-network"><i /> BOT Chain Testnet</div>
+        <div className="header-network"><i /> {BOTCHAIN_DEPLOYMENT.chainName}</div>
         <div className="wallet-area">
-          <a className="faucet-link" href="https://faucet.botchain.ai" target="_blank" rel="noreferrer">Get test BOT <ExternalLink size={13} /></a>
-          <a className="connected-wallet" href={`https://scan.bohr.life/address/${account}`} target="_blank" rel="noreferrer"><i className="online" /><span>{shortAddress(account)}</span><ExternalLink size={14} /></a>
+          {BOTCHAIN_DEPLOYMENT.isTestnet ? <a className="faucet-link" href="https://faucet.botchain.ai" target="_blank" rel="noreferrer">Get test BOT <ExternalLink size={13} /></a> : null}
+          <a className="connected-wallet" href={`${BOTCHAIN_DEPLOYMENT.explorerUrl}/address/${account}`} target="_blank" rel="noreferrer"><i className="online" /><span>{shortAddress(account)}</span><ExternalLink size={14} /></a>
           <button className="disconnect-button" type="button" onClick={onDisconnect} aria-label="Disconnect wallet"><LogOut size={15} /><span>Disconnect</span></button>
         </div>
       </header>
 
       <main id="main" className="workspace">
         <div className="page-intro">
-          <div><p className="section-label">Payment splitter</p><h1>Create a split</h1><p>Define recipient wallets and shares, then store the split on BOT Chain Testnet.</p></div>
+          <div><p className="section-label">Payment splitter</p><h1>Create a split</h1><p>Define recipient wallets and shares, then store the split on {BOTCHAIN_DEPLOYMENT.chainName}.</p></div>
           <div className={`contract-status ${CONTRACT_READY ? "ready" : "not-ready"}`}><ShieldCheck size={17} /><span><strong>{CONTRACT_READY ? "Contract connected" : "Contract not configured"}</strong><small>{CONTRACT_READY ? shortAddress(SPLITCHAIN_ADDRESS as string) : "Add the deployed address"}</small></span></div>
         </div>
 

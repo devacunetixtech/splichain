@@ -13,16 +13,16 @@ if (!matcher.test(source)) {
   throw new Error("Could not locate the BOT Chain deployment configuration block.");
 }
 
-const testnetConfig = `// DEPLOYMENT_CONFIG_START
+const mainnetConfig = `// DEPLOYMENT_CONFIG_START
 export const BOTCHAIN_DEPLOYMENT = {
-  chainId: 968,
-  chainName: "BOT Chain Testnet",
-  rpcUrl: "https://rpc.bohr.life",
-  explorerUrl: "https://scan.bohr.life",
-  isTestnet: true,
+  chainId: 677,
+  chainName: "BOT Chain",
+  rpcUrl: "https://rpc.botchain.ai",
+  explorerUrl: "https://scan.botchain.ai",
+  isTestnet: false,
   contractAddress: "${address}",
 } as const;
 // DEPLOYMENT_CONFIG_END`;
 
-fs.writeFileSync(target, source.replace(matcher, testnetConfig));
-console.log(`Frontend activated on BOT Chain testnet with contract ${address}`);
+fs.writeFileSync(target, source.replace(matcher, mainnetConfig));
+console.log(`Frontend activated on BOT Chain mainnet with contract ${address}`);
